@@ -23,24 +23,22 @@ var vals = [
 cache
 .msave(arr)
 
-
 cache
-.fetch(keys[1])
-.exec(function(err, value) {
-  console.log(value)
-})
-
-cache
-.fetch('callback1', function(err, value) {
+.get('callback1', function(err, value) {
   if (err) throw err
 
   console.log(value)
 })
 
-cache.mfetch(keys, function(err, values) {
+cache.get(keys, function(err, values) {
   console.log(values)
 })
 
-cache.mfetch(keys).exec(function(err, values) {
+cache.get('callback1').exec(function(err, values) {
   console.log(values)
 })
+
+cache.get(keys).exec(function(err, values) {
+  console.log(values)
+})
+
