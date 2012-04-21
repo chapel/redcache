@@ -24,12 +24,22 @@ cache
 .msave(arr)
 
 cache
-.get('callback1', function(err, value) {
-  if (err) throw err
+.get('callback1', function(err, values) {
 
-  console.log(value)
+  console.log(err, values)
 })
 
+cache
+.get('callback11') 
+.miss(function(done) {
+  console.log('miss')
+  done(null, ['callback11', 'testing callback11'], 'testing callback11')
+})
+.run(function(err, values) {
+  console.log(err, values)
+})
+
+/*
 cache.get(keys, function(err, values) {
   console.log(values)
 })
@@ -38,7 +48,7 @@ cache.get('callback1').exec(function(err, values) {
   console.log(values)
 })
 
-cache.get(keys).exec(function(err, values) {
+cache.get(keys).run(function(err, values) {
   console.log(values)
 })
-
+*/
