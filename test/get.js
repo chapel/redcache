@@ -20,11 +20,16 @@ describe('Get', function() {
     .exec(done)
   })
 
+  after(function(done) {
+    client.del([cache._key('callback'), cache._key('chainedcallback')], done)
+  })
+
   describe('single key', function() {
     describe('no miss function', function() {
       it('should fetch value and callback', function(done) {
         cache
         .get('callback', function(err, value) {
+          debugger;
           if (err) throw err
 
           value.should.equal(vals[0])

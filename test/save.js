@@ -4,6 +4,10 @@ var redis = require('redis')
   , client = redis.createClient()
 
 describe('Save', function() {
+  after(function(done) {
+    client.del([cache._key('callback'), cache._key('nocallback'), cache._key('multiple1'), cache._key('multiple2')], done)
+  })
+
   describe('single key', function() {
     describe('with a callback', function() {
       it('should save to redis and callback', function(done) {

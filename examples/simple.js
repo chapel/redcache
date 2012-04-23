@@ -2,7 +2,7 @@ var redcache = require('../index')
   , redis = require('redis')
   , client = redis.createClient()
 
-var cache = redcache.create({prepend: 'local'})
+var cache = redcache.create({prepend: 'local', ttl: 100})
 
 var arr = [
     { key:'callback1'
@@ -23,22 +23,39 @@ var vals = [
 cache
 .msave(arr)
 
-cache
-.get('callback1', function(err, values) {
+function callback (err, value) {
+  if (err) throw err
 
-  console.log(err, values)
-})
+  console.log(value)
+}
+
+function miss (done) {
+  console.log('miss', keys[0])
+  done(null, [keys[0], vals[0]], vals[0])
+}
 
 cache
-.get('callback11') 
+.get(keys[0], callback)
+
+cache
+.get(keys[0])
+.run(callback)
+
+cache
+.get(keys[0], miss, callback)
+
+cache
+.get(keys[0])
+.miss(miss)
+.run(callback)
+
+cache
+.get('callback3')
 .miss(function(done) {
-  console.log('miss')
-  done(null, ['callback11', 'testing callback11'], 'testing callback11')
+  console.log('miss', 'callback3')
+  done(null, ['callback3', 'testing callback3'], 'testing callback3')
 })
-.run(function(err, values) {
-  console.log(err, values)
-})
-
+.run(callback)
 /*
 cache.get(keys, function(err, values) {
   console.log(values)

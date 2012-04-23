@@ -6,4 +6,10 @@ test:
 		--reporter $(REPORTER) \
 		--growl
 
-.PHONY: test
+test-debug:
+	@./node_modules/.bin/mocha debug \
+		--require should \
+		--reporter $(REPORTER) \
+		--growl
+
+.PHONY: test test-debug
