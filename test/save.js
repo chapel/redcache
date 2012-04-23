@@ -3,14 +3,10 @@ var redis = require('redis')
   , cache = redcache.create({prepend: 'test:save', ttl: 100})
   , client = redis.createClient()
 
-describe('Save', function() {
-  after(function(done) {
-    client.del([cache._key('callback'), cache._key('nocallback'), cache._key('multiple1'), cache._key('multiple2')], done)
-  })
-
+describe('cache.save()', function() {
   describe('single key', function() {
-    describe('with a callback', function() {
-      it('should save to redis and callback', function(done) {
+    describe('with callback', function() {
+      it('should save value to redis and callback', function(done) {
         cache
         .save('callback', 'testing callback', function(err) {
           client.get(cache._key('callback'), function(err, value) {
@@ -24,7 +20,7 @@ describe('Save', function() {
     })
 
     describe('without a callback', function() {
-      it('should save to redis', function(done) {
+      it('should save value to redis', function(done) {
         cache
         .save('nocallback', 'testing without callback')
 
@@ -55,7 +51,7 @@ describe('Save', function() {
       , 'testing multiple2'
     ]
     describe('with a callback', function() {
-      it('should save to redis and callback', function(done) {
+      it('should save value to redis and callback', function(done) {
         cache
         .msave(arr, function(err) {
           client.mget(keys, function(err, values) {
@@ -70,7 +66,7 @@ describe('Save', function() {
     })
 
     describe('without a callback', function() {
-      it('should save to redis', function(done) {
+      it('should save value to redis', function(done) {
         cache
         .msave(arr)
 

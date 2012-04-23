@@ -4,7 +4,7 @@ var redis = require('redis')
   , client = redis.createClient()
   , vals = ['testing callback', 'testing chained callback']
 
-describe('Get', function() {
+describe('cache.get()', function() {
   before(function(done) {
     client.multi()
     .setex(
@@ -20,13 +20,9 @@ describe('Get', function() {
     .exec(done)
   })
 
-  after(function(done) {
-    client.del([cache._key('callback'), cache._key('chainedcallback')], done)
-  })
-
   describe('single key', function() {
-    describe('no miss function', function() {
-      it('should fetch value and callback', function(done) {
+    describe('without miss fn', function() {
+      it('should return using inline callback', function(done) {
         cache
         .get('callback', function(err, value) {
           debugger;
@@ -37,7 +33,7 @@ describe('Get', function() {
         })
       })
 
-      it('should fetch value and chained callback', function(done) {
+      it('should return using chained callback', function(done) {
         cache
         .get('callback')
         .run(function(err, value) {
@@ -49,8 +45,8 @@ describe('Get', function() {
       })
     })
 
-    describe('miss function', function() {
-      it('should fetch value and callback', function(done) {
+    describe('with miss fn', function() {
+      it('should return using inline callback', function(done) {
         cache
         .get('callback', function(done) {
           done(null, ['callback', vals[0]], vals[0])
@@ -62,7 +58,7 @@ describe('Get', function() {
         })
       })
 
-      it('should fetch value and chained callback', function(done) {
+      it('should return using chained callback', function(done) {
         cache
         .get('callback')
         .miss(function(done) {
@@ -79,7 +75,7 @@ describe('Get', function() {
   })
 
   describe('multiple keys', function() {
-    it('should fetch values and callback', function(done) {
+    it('should return using inline callback', function(done) {
       cache
       .mfetch(['callback', 'chainedcallback'], function(err, values) {
         if (err) throw err
