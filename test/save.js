@@ -4,15 +4,26 @@ var redis = require('redis')
   , client = redis.createClient()
 
 describe('cache.save()', function() {
+  afterEach(function(done) {
+    client.del([
+        cache._key('key1')
+      , cache._key('key2')
+      , cache._key('multiple1')
+      , cache._key('multiple2')
+      , cache._key('multiple3')
+      , cache._key('multiple4')
+    ], done)
+  })
+
   describe('single key', function() {
     describe('with callback', function() {
-      it('should save value to redis and callback', function(done) {
+      it('should save value to redis', function(done) {
         cache
-        .save({key: 'callback', value: 'testing callback'}, function(err) {
-          client.get(cache._key('callback'), function(err, value) {
+        .save({key: 'key1', value: 'value1'}, function(err) {
+          client.get(cache._key('key1'), function(err, value) {
             if (err) throw err
 
-            value.should.equal('testing callback')
+            value.should.equal('value1')
             done()
           })
         })
@@ -22,12 +33,12 @@ describe('cache.save()', function() {
     describe('without a callback', function() {
       it('should save value to redis', function(done) {
         cache
-        .save({key: 'nocallback', value: 'testing without callback'})
+        .save({key: 'key2', value: 'value2'})
 
-        client.get(cache._key('nocallback'), function(err, value) {
+        client.get(cache._key('key2'), function(err, value) {
           if (err) throw err
 
-          value.should.equal('testing without callback')
+          value.should.equal('value2')
           done()
         })
       })
@@ -36,29 +47,37 @@ describe('cache.save()', function() {
 
   describe('multiple keys', function() {
     var arr = [
-        { key:'multiple1'
-        , value:'testing multiple1'
+        {
+            key:'multiple1'
+          , value:'multi-value1'
         }
-      , { key:'multiple2'
-        , value:'testing multiple2'
+      , {
+            key:'multiple2'
+          , value:'multi-value2'
         }
+      , {
+            key:'multiple3'
+          , value:'multi-value3'
+        }
+      , {
+            key:'multiple4'
+          , value:'multi-value4'
+        }
+
     ]
 
-    var keys = [cache._key('multiple1'), cache._key('multiple2')]
+    var keys1 = [cache._key('multiple1'), cache._key('multiple2')]
+      , keys2 = [cache._key('multiple3'), cache._key('multiple4')]
 
-    var vals = [
-        'testing multiple1'
-      , 'testing multiple2'
-    ]
     describe('with a callback', function() {
-      it('should save value to redis and callback', function(done) {
+      it('should save value to redis', function(done) {
         cache
-        .msave(arr, function(err) {
-          client.mget(keys, function(err, values) {
+        .msave(arr.slice(0, 2), function(err) {
+          client.mget(keys1, function(err, values) {
             if (err) throw err
 
-            values.should.include(vals[0])
-            values.should.include(vals[1])
+            values.should.include(arr[0].value)
+            values.should.include(arr[1].value)
             done()
           })
         })
@@ -68,13 +87,13 @@ describe('cache.save()', function() {
     describe('without a callback', function() {
       it('should save value to redis', function(done) {
         cache
-        .msave(arr)
+        .msave(arr.slice(2, 4))
 
-        client.mget(keys, function(err, values) {
+        client.mget(keys2, function(err, values) {
           if (err) throw err
 
-          values.should.include(vals[0])
-          values.should.include(vals[1])
+          values.should.include(arr[2].value)
+          values.should.include(arr[3].value)
           done()
         })
       })

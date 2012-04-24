@@ -3,18 +3,18 @@ var redis = require('redis')
   , should = require('should')
   , cache = redcache.create({prepend: 'test:fetch', ttl: 100})
   , client = redis.createClient()
-  , vals = ['testing callback', 'testing chained callback']
+  , vals = ['value1', 'value2']
 
 describe('cache.fetch()', function() {
   before(function(done) {
     client.multi()
     .setex(
-        cache._key('callback')
+        cache._key('key1')
       , 100
       , vals[0]
     )
     .setex(
-        cache._key('chainedcallback')
+        cache._key('key2')
       , 100
       , vals[1]
     )
@@ -24,7 +24,7 @@ describe('cache.fetch()', function() {
   describe('single key', function() {
     it('should return value', function(done) {
       cache
-      .fetch('callback', function(err, value) {
+      .fetch('key1', function(err, value) {
         if (err) throw err
 
         value.should.equal(vals[0])
@@ -34,7 +34,7 @@ describe('cache.fetch()', function() {
 
     it('shouldn\'t return value', function(done) {
       cache
-      .fetch('callback1', function(err, value) {
+      .fetch('key3', function(err, value) {
         if (err) throw err
 
         should.not.exist(value)
@@ -46,7 +46,7 @@ describe('cache.fetch()', function() {
   describe('multiple keys', function() {
     it('should return all values', function(done) {
       cache
-      .mfetch(['callback', 'chainedcallback'], function(err, values) {
+      .mfetch(['key1', 'key2'], function(err, values) {
         if (err) throw err
 
         values[0].should.equal(vals[0])
@@ -57,7 +57,7 @@ describe('cache.fetch()', function() {
 
     it('should return one value', function(done) {
       cache
-      .mfetch(['callback1', 'chainedcallback'], function(err, values) {
+      .mfetch(['key', 'key2'], function(err, values) {
         if (err) throw err
 
         should.not.exist(values[0])
@@ -68,10 +68,11 @@ describe('cache.fetch()', function() {
 
     it('shouldn\'t return any values', function(done) {
       cache
-      .fetch(['callback1', 'callback2'], function(err, values) {
+      .mfetch(['key3', 'key4'], function(err, values) {
         if (err) throw err
 
-        should.not.exist(values)
+        should.not.exist(values[0])
+        should.not.exist(values[1])
         done()
       })
     })

@@ -1,61 +1,69 @@
-var redcache = require('../index')
-  , redis = require('redis')
-  , client = redis.createClient()
+var redcache = require('../')
+  , cache    = redcache.create()
 
-var cache = redcache.create({prepend: 'local', ttl: 100})
+function db (key, callback) {
+  var example = {
+      key: 'value'
+    , key2: 'value2'
+    , key3: 'value3'
+  }
 
-var arr = [
-    { key:'callback1'
-    , value:'testing callback1'
-    }
-  , { key:'callback2'
-    , value:'testing callback2'
-    }
-]
-
-var keys = ['local:callback1', 'local:callback2']
-
-var vals = [
-    'testing callback1'
-  , 'testing callback2'
-]
+  callback(null, example[key])
+}
 
 cache
-.msave(arr)
+.get('key')
+.miss(function(missed, done) {
+  // This function is called when a key
+  // is not found in the cache.
 
-function callback (err, value) {
+  db(missed.key, function(err, value) {
+    // Anything passed to done will be
+    // interpreted as an error and immediately
+    // sent to the final run callback as
+    // an error.
+    if (err) return done(err)
+
+    missed.save(value)
+    done()
+  })
+})
+.run(function(err, value) {
   if (err) throw err
 
   console.log(value)
-  keys.push('local:callback4')
-  client.del(keys)
-}
-
-function miss (done) {
-  console.log('miss', keys[0])
-  done(null, [keys[0], vals[0]], vals[0])
-}
+})
 
 cache
-.get(['callback1', 'callback4'])
-.miss(function(keys, add, done) {
-  for (var i = 0; i < keys.length; i+=1) {
-    add(keys[i], 'value4')
+.get(['key2', 'key3'])
+.miss(function(missed, done) {
+  // In the case of passing an array of keys
+  // missed can be either an array or a single
+  // object like above.
+
+  if (missed.length) {
+    var len = missed.length
+
+    missed.forEach(function(missed, i) {
+      db(missed.key, function(err, value) {
+        if (err) return done(err)
+
+        missed.save(value)
+        if (i >= len) done()
+      })
+    })
+  } else {
+    db(missed.key, function(err, value) {
+      if (err) return done(err)
+
+      missed.save(value)
+      done()
+    })
   }
-  done(null)
-})
-.run(callback)
 
-/*
-cache.get(keys, function(err, values) {
+})
+.run(function(err, values) {
+  if (err) throw err
+
   console.log(values)
 })
-
-cache.get('callback1').exec(function(err, values) {
-  console.log(values)
-})
-
-cache.get(keys).run(function(err, values) {
-  console.log(values)
-})
-*/
