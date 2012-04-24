@@ -1,7 +1,7 @@
 {
   "author": "Jacob Chapel",
   "name": "redcache",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "repository": {
     "type": "git",
     "url": "git://github.com/chapel/redcache.git"
