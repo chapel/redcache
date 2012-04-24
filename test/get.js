@@ -35,125 +35,135 @@ describe('cache.get()', function() {
 
   describe('single key', function() {
     describe('without miss fn', function() {
-      it('should return value using inline callback', function(done) {
-        cache
-        .get('key1', function(err, value) {
-          should.not.exist(err)
+      describe('using inline callback', function() {
+        it('should return value', function(done) {
+          cache
+          .get('key1', function(err, value) {
+            should.not.exist(err)
 
-          value.should.equal(vals[0])
-          done()
+            value.should.equal(vals[0])
+            done()
+          })
+        })
+      
+        it('should\'t return value', function(done) {
+          cache
+          .get('key3', function(err, value) {
+            should.not.exist(err)
+
+            should.not.exist(value)
+            done()
+          })
         })
       })
 
-      it('should return value using chained callback', function(done) {
-        cache
-        .get('key1')
-        .run(function(err, value) {
-          should.not.exist(err)
+      describe('using chained callback', function() {
+        it('should return value', function(done) {
+          cache
+          .get('key1')
+          .run(function(err, value) {
+            should.not.exist(err)
 
-          value.should.equal(vals[0])
-          done()
+            value.should.equal(vals[0])
+            done()
+          })
         })
-      })
 
-      it('should\'t return value using inline callback', function(done) {
-        cache
-        .get('key3', function(err, value) {
-          should.not.exist(err)
 
-          should.not.exist(value)
-          done()
-        })
-      })
+        it('should\'t return value', function(done) {
+          cache
+          .get('key3')
+          .run(function(err, value) {
+            should.not.exist(err)
 
-      it('should\'t return value using chained callback', function(done) {
-        cache
-        .get('key3')
-        .run(function(err, value) {
-          should.not.exist(err)
-
-          should.not.exist(value)
-          done()
+            should.not.exist(value)
+            done()
+          })
         })
       })
     })
 
     describe('with miss fn', function() {
-      it('should return value using inline callback', function(done) {
-        cache
-        .get('key1', function(keys, add, done) {
-          done('Should not miss')
-        }, function(err, value) {
-          should.not.exist(err)
+      describe('using inline callback', function() {
+        it('should return value', function(done) {
+          cache
+          .get('key1', function(missed, done) {
+            done('Should not miss')
+          }, function(err, value) {
+            should.not.exist(err)
 
-          value.should.equal(vals[0])
-          done()
+            value.should.equal(vals[0])
+            done()
+          })
+        })
+
+        it('should return value from miss', function(done) {
+          cache
+          .get('key3', function(missed, done) {
+            missed.save('value3')
+            done(null)
+          }, function(err, value) {
+            should.not.exist(err)
+
+            value.should.equal('value3')
+            done()
+          })
+        })
+
+        it('should return error from miss', function(done) {
+          cache
+          .get('key3', function(missed, done) {
+            done('Problem getting value')
+          }, function(err, value) {
+            should.exist(err)
+
+            done()
+          })
         })
       })
 
-      it('should return value using chained callback', function(done) {
-        cache
-        .get('key1')
-        .miss(function(keys, add, done) {
-          done('Should not miss')
+      describe('using chained callback', function() {
+        it('should return value', function(done) {
+          cache
+          .get('key1')
+          .miss(function(missed, done) {
+            done('Should not miss')
+          })
+          .run(function(err, value) {
+            should.not.exist(err)
+
+            value.should.equal(vals[0])
+            done()
+          })
         })
-        .run(function(err, value) {
-          should.not.exist(err)
 
-          value.should.equal(vals[0])
-          done()
+
+        it('should return value from miss', function(done) {
+          cache
+          .get('key4')
+          .miss(function(missed, done) {
+            missed.save('value4')
+            done(null)
+          })
+          .run(function(err, value) {
+            should.not.exist(err)
+
+            value.should.equal('value4')
+            done()
+          })
         })
-      })
 
-      it('should return value using inline miss then callback', function(done) {
-        cache
-        .get('key3', function(keys, add, done) {
-          add(keys, 'value3')
-          done(null)
-        }, function(err, value) {
-          should.not.exist(err)
+        it('should return error from miss', function(done) {
+          cache
+          .get('key4')
+          .miss(function(missed, done) {
+            done('Problem getting value')
+          })
+          .run(function(err, value) {
+            should.exist(err)
 
-          value.should.equal('value3')
-          done()
-        })
-      })
-
-      it('should return value using chained miss then call chained callback', function(done) {
-        cache
-        .get('key4')
-        .miss(function(keys, add, done) {
-          add(keys, 'value4')
-          done(null)
-        })
-        .run(function(err, value) {
-          should.not.exist(err)
-
-          value.should.equal('value4')
-          done()
-        })
-      })
-
-      it('should return error using inline miss then callback', function(done) {
-        cache
-        .get('key3', function(keys, add, done) {
-          done('Problem getting value')
-        }, function(err, value) {
-          should.exist(err)
-
-          done()
-        })
-      })
-
-      it('should return error using chained miss then call chained callback', function(done) {
-        cache
-        .get('key4')
-        .miss(function(keys, add, done) {
-          done('Problem getting value')
-        })
-        .run(function(err, value) {
-          should.exist(err)
-
-          done()
+            done()
+          })
         })
       })
     })
@@ -161,133 +171,141 @@ describe('cache.get()', function() {
 
   describe('multiple keys', function() {
     describe('without miss fn', function() {
-      it('should return values using inline callback', function(done) {
-        cache
-        .get(['key1', 'key2'], function(err, values) {
-          should.not.exist(err)
+      describe('using inline callback', function() {
+        it('should return values', function(done) {
+          cache
+          .get(['key1', 'key2'], function(err, values) {
+            should.not.exist(err)
 
-          values[0].should.equal(vals[0])
-          values[1].should.equal(vals[1])
-          done()
+            values[0].should.equal(vals[0])
+            values[1].should.equal(vals[1])
+            done()
+          })
+        })
+
+        it('should\'t return values', function(done) {
+          cache
+          .get(['key3', 'key4'], function(err, values) {
+            should.not.exist(err)
+
+            should.not.exist(values)
+            done()
+          })
         })
       })
 
-      it('should return values using chained callback', function(done) {
-        cache
-        .get(['key1', 'key2'])
-        .run(function(err, values) {
-          should.not.exist(err)
+      describe('using chained callback', function() {
+        it('should return values', function(done) {
+          cache
+          .get(['key1', 'key2'])
+          .run(function(err, values) {
+            should.not.exist(err)
 
-          values[0].should.equal(vals[0])
-          values[1].should.equal(vals[1])
-          done()
+            values[0].should.equal(vals[0])
+            values[1].should.equal(vals[1])
+            done()
+          })
         })
-      })
 
-      it('should\'t return values using inline callback', function(done) {
-        cache
-        .get(['key3', 'key4'], function(err, values) {
-          should.not.exist(err)
+        it('should\'t return values', function(done) {
+          cache
+          .get(['key3', 'key4'])
+          .run(function(err, values) {
+            should.not.exist(err)
 
-          should.not.exist(values)
-          done()
-        })
-      })
-
-      it('should\'t return values using chained callback', function(done) {
-        cache
-        .get(['key3', 'key4'])
-        .run(function(err, values) {
-          should.not.exist(err)
-
-          should.not.exist(values)
-          done()
+            should.not.exist(values)
+            done()
+          })
         })
       })
     })
 
     describe('with miss fn', function() {
-      it('should return values using inline callback', function(done) {
-        cache
-        .get(['key1', 'key2'], function(keys, add, done) {
-          done('Should not miss')
-        }, function(err, values) {
-          should.not.exist(err)
+      describe('using inline callback', function() {
+        it('should return values', function(done) {
+          cache
+          .get(['key1', 'key2'], function(missed, done) {
+            done('Should not miss')
+          }, function(err, values) {
+            should.not.exist(err)
 
-          values[0].should.equal(vals[0])
-          values[1].should.equal(vals[1])
-          done()
+            values[0].should.equal(vals[0])
+            values[1].should.equal(vals[1])
+            done()
+          })
+        })
+
+        it('should return values from miss', function(done) {
+          cache
+          .get(['key3', 'key4'], function(missed, done) {
+            missed[0].save('value3')
+            missed[1].save('value4')
+            done(null)
+          }, function(err, values) {
+            should.not.exist(err)
+
+            values[0].should.equal('value3')
+            values[1].should.equal('value4')
+            done()
+          })
+        })
+
+        it('should return error from miss', function(done) {
+          cache
+          .get(['key3', 'key4'], function(missed, done) {
+            done('Problem getting values')
+          }, function(err, values) {
+            should.exist(err)
+
+            done()
+          })
         })
       })
 
-      it('should return values using chained callback', function(done) {
-        cache
-        .get(['key1', 'key2'])
-        .miss(function(keys, add, done) {
-          done('Should not miss')
+      describe('using chained callback', function() {
+        it('should return values', function(done) {
+          cache
+          .get(['key1', 'key2'])
+          .miss(function(missed, done) {
+            done('Should not miss')
+          })
+          .run(function(err, values) {
+            should.not.exist(err)
+
+            values[0].should.equal(vals[0])
+            values[1].should.equal(vals[1])
+            done()
+          })
         })
-        .run(function(err, values) {
-          should.not.exist(err)
 
-          values[0].should.equal(vals[0])
-          values[1].should.equal(vals[1])
-          done()
+        it('should return value from miss', function(done) {
+          cache
+          .get(['key3', 'key4'])
+          .miss(function(missed, done) {
+            missed[0].save('value3')
+            missed[1].save('value4')
+            done(null)
+          })
+          .run(function(err, values) {
+            should.not.exist(err)
+
+            values[0].should.equal('value3')
+            values[1].should.equal('value4')
+            done()
+          })
         })
-      })
 
-      it('should return values using inline miss then callback', function(done) {
-        cache
-        .get(['key3', 'key4'], function(keys, add, done) {
-          add(keys[0], 'value3')
-          add(keys[1], 'value4')
-          done(null)
-        }, function(err, values) {
-          should.not.exist(err)
+        it('should return error from miss', function(done) {
+          cache
+          .get(['key3', 'key4'])
+          .miss(function(missed, done) {
+            done('Problem getting values')
+          })
+          .run(function(err, values) {
+            should.exist(err)
 
-          values[0].should.equal('value3')
-          values[1].should.equal('value4')
-          done()
-        })
-      })
-
-      it('should return value using chained miss then call chained callback', function(done) {
-        cache
-        .get(['key3', 'key4'])
-        .miss(function(keys, add, done) {
-          add(keys[0], 'value3')
-          add(keys[1], 'value4')
-          done(null)
-        })
-        .run(function(err, values) {
-          should.not.exist(err)
-
-          values[0].should.equal('value3')
-          values[1].should.equal('value4')
-          done()
-        })
-      })
-
-      it('should return error using inline miss then callback', function(done) {
-        cache
-        .get(['key3', 'key4'], function(keys, add, done) {
-          done('Problem getting values')
-        }, function(err, values) {
-          should.exist(err)
-
-          done()
-        })
-      })
-
-      it('should return error using chained miss then call chained callback', function(done) {
-        cache
-        .get(['key3', 'key4'])
-        .miss(function(keys, add, done) {
-          done('Problem getting values')
-        })
-        .run(function(err, values) {
-          should.exist(err)
-
-          done()
+            done()
+          })
         })
       })
     })

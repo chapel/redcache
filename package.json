@@ -1,7 +1,7 @@
 {
   "author": "Jacob Chapel",
   "name": "redcache",
-  "version": "0.0.1",
+  "version": "0.8.5",
   "repository": {
     "type": "git",
     "url": "git://github.com/chapel/redcache.git"
@@ -11,10 +11,11 @@
     "node": "~0.6.9"
   },
   "dependencies": {
-    "redis": "~0.7.1",
+    "redis": "~0.7.1"
+  },
+  "devDependencies": {
     "mocha": "~1.0.1",
     "should": "~0.6.1"
   },
-  "devDependencies": {},
   "optionalDependencies": {}
 }
