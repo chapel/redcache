@@ -108,7 +108,6 @@ describe('cache.get()', function() {
       it('should return value using inline miss then callback', function(done) {
         cache
         .get('key3', function(keys, add, done) {
-          console.log(keys)
           add(keys, 'value3')
           done(null)
         }, function(err, value) {
@@ -245,7 +244,6 @@ describe('cache.get()', function() {
         }, function(err, values) {
           should.not.exist(err)
 
-          console.log(values)
           values[0].should.equal('value3')
           values[1].should.equal('value4')
           done()
@@ -257,7 +255,7 @@ describe('cache.get()', function() {
         .get(['key3', 'key4'])
         .miss(function(keys, add, done) {
           add(keys[0], 'value3')
-          add(keys[0], 'value4')
+          add(keys[1], 'value4')
           done(null)
         })
         .run(function(err, values) {
@@ -274,7 +272,6 @@ describe('cache.get()', function() {
         .get(['key3', 'key4'], function(keys, add, done) {
           done('Problem getting values')
         }, function(err, values) {
-          console.log(err)
           should.exist(err)
 
           done()
@@ -288,7 +285,6 @@ describe('cache.get()', function() {
           done('Problem getting values')
         })
         .run(function(err, values) {
-          console.log(err)
           should.exist(err)
 
           done()
