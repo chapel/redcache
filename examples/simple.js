@@ -35,25 +35,12 @@ function miss (done) {
 }
 
 cache
-.get(keys[0], callback)
-
-cache
-.get(keys[0])
-.run(callback)
-
-cache
-.get(keys[0], miss, callback)
-
-cache
-.get(keys[0])
-.miss(miss)
-.run(callback)
-
-cache
-.get('callback3')
-.miss(function(done) {
+.get(['callback1', 'callback4'])
+.miss(function(add, done) {
   console.log('miss', 'callback3')
-  done(null, ['callback3', 'testing callback3'], 'testing callback3')
+  add('callback1', 'value1')
+  add('callback4', 'value4')
+  done(null)
 })
 .run(callback)
 /*

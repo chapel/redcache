@@ -3,7 +3,6 @@ var redis = require('redis')
   , cache = redcache.create({prepend: 'test:save', ttl: 100})
   , client = redis.createClient()
 
-
 describe('cache.save()', function() {
   describe('single key', function() {
     describe('with callback', function() {
