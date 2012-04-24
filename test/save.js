@@ -8,7 +8,7 @@ describe('cache.save()', function() {
     describe('with callback', function() {
       it('should save value to redis and callback', function(done) {
         cache
-        .save('callback', 'testing callback', function(err) {
+        .save({key: 'callback', value: 'testing callback'}, function(err) {
           client.get(cache._key('callback'), function(err, value) {
             if (err) throw err
 
@@ -22,7 +22,7 @@ describe('cache.save()', function() {
     describe('without a callback', function() {
       it('should save value to redis', function(done) {
         cache
-        .save('nocallback', 'testing without callback')
+        .save({key: 'nocallback', value: 'testing without callback'})
 
         client.get(cache._key('nocallback'), function(err, value) {
           if (err) throw err

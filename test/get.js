@@ -81,7 +81,7 @@ describe('cache.get()', function() {
     describe('with miss fn', function() {
       it('should return value using inline callback', function(done) {
         cache
-        .get('key1', function(add, done) {
+        .get('key1', function(keys, add, done) {
           done('Should not miss')
         }, function(err, value) {
           should.not.exist(err)
@@ -94,7 +94,7 @@ describe('cache.get()', function() {
       it('should return value using chained callback', function(done) {
         cache
         .get('key1')
-        .miss(function(add, done) {
+        .miss(function(keys, add, done) {
           done('Should not miss')
         })
         .run(function(err, value) {
@@ -107,8 +107,9 @@ describe('cache.get()', function() {
 
       it('should return value using inline miss then callback', function(done) {
         cache
-        .get('key3', function(add, done) {
-          add('key3', 'value3')
+        .get('key3', function(keys, add, done) {
+          console.log(keys)
+          add(keys, 'value3')
           done(null)
         }, function(err, value) {
           should.not.exist(err)
@@ -121,8 +122,8 @@ describe('cache.get()', function() {
       it('should return value using chained miss then call chained callback', function(done) {
         cache
         .get('key4')
-        .miss(function(add, done) {
-          add('key4', 'value4')
+        .miss(function(keys, add, done) {
+          add(keys, 'value4')
           done(null)
         })
         .run(function(err, value) {
@@ -135,7 +136,7 @@ describe('cache.get()', function() {
 
       it('should return error using inline miss then callback', function(done) {
         cache
-        .get('key3', function(add, done) {
+        .get('key3', function(keys, add, done) {
           done('Problem getting value')
         }, function(err, value) {
           should.exist(err)
@@ -147,7 +148,7 @@ describe('cache.get()', function() {
       it('should return error using chained miss then call chained callback', function(done) {
         cache
         .get('key4')
-        .miss(function(add, done) {
+        .miss(function(keys, add, done) {
           done('Problem getting value')
         })
         .run(function(err, value) {
@@ -209,7 +210,7 @@ describe('cache.get()', function() {
     describe('with miss fn', function() {
       it('should return values using inline callback', function(done) {
         cache
-        .get(['key1', 'key2'], function(add, done) {
+        .get(['key1', 'key2'], function(keys, add, done) {
           done('Should not miss')
         }, function(err, values) {
           should.not.exist(err)
@@ -223,7 +224,7 @@ describe('cache.get()', function() {
       it('should return values using chained callback', function(done) {
         cache
         .get(['key1', 'key2'])
-        .miss(function(add, done) {
+        .miss(function(keys, add, done) {
           done('Should not miss')
         })
         .run(function(err, values) {
@@ -237,9 +238,9 @@ describe('cache.get()', function() {
 
       it('should return values using inline miss then callback', function(done) {
         cache
-        .get(['key3', 'key4'], function(add, done) {
-          add('key3', 'value3')
-          add('key4', 'value4')
+        .get(['key3', 'key4'], function(keys, add, done) {
+          add(keys[0], 'value3')
+          add(keys[1], 'value4')
           done(null)
         }, function(err, values) {
           should.not.exist(err)
@@ -254,9 +255,9 @@ describe('cache.get()', function() {
       it('should return value using chained miss then call chained callback', function(done) {
         cache
         .get(['key3', 'key4'])
-        .miss(function(add, done) {
-          add('key3', 'value3')
-          add('key4', 'value4')
+        .miss(function(keys, add, done) {
+          add(keys[0], 'value3')
+          add(keys[0], 'value4')
           done(null)
         })
         .run(function(err, values) {
@@ -270,7 +271,7 @@ describe('cache.get()', function() {
 
       it('should return error using inline miss then callback', function(done) {
         cache
-        .get(['key3', 'key4'], function(add, done) {
+        .get(['key3', 'key4'], function(keys, add, done) {
           done('Problem getting values')
         }, function(err, values) {
           console.log(err)
@@ -283,7 +284,7 @@ describe('cache.get()', function() {
       it('should return error using chained miss then call chained callback', function(done) {
         cache
         .get(['key3', 'key4'])
-        .miss(function(add, done) {
+        .miss(function(keys, add, done) {
           done('Problem getting values')
         })
         .run(function(err, values) {

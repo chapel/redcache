@@ -13,7 +13,7 @@ var arr = [
     }
 ]
 
-var keys = ['callback1', 'callback2']
+var keys = ['local:callback1', 'local:callback2']
 
 var vals = [
     'testing callback1'
@@ -27,6 +27,8 @@ function callback (err, value) {
   if (err) throw err
 
   console.log(value)
+  keys.push('local:callback4')
+  client.del(keys)
 }
 
 function miss (done) {
@@ -36,13 +38,14 @@ function miss (done) {
 
 cache
 .get(['callback1', 'callback4'])
-.miss(function(add, done) {
-  console.log('miss', 'callback3')
-  add('callback1', 'value1')
-  add('callback4', 'value4')
+.miss(function(keys, add, done) {
+  for (var i = 0; i < keys.length; i+=1) {
+    add(keys[i], 'value4')
+  }
   done(null)
 })
 .run(callback)
+
 /*
 cache.get(keys, function(err, values) {
   console.log(values)
