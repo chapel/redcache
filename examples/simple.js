@@ -49,7 +49,7 @@ cache
         if (err) return done(err)
 
         missed.save(value)
-        if (i >= len) done()
+        if ((1 + i) === len) done()
       })
     })
   } else {

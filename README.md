@@ -102,6 +102,7 @@ Creates a new connection to the Redis cache. Config is an object that holds vari
 * ```host```: Defaults to ```127.0.0.1``` unless specified. 
 * ```options```: These options are passed to [node_redis](https://github.com/mranney/node_redis) when creating the client. (See node_redis readme for more info)
 * ```auth```: If set, it will be used for creating the Redis client connection.
+* ```debug```: If set, will output all debug output from ```node_redis```.
 
 cache.get(keys)
 ---
